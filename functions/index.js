@@ -9,7 +9,7 @@ exports.newUserSignup = functions.auth.user().onCreate(user => {
     return admin.firestore().collection('users').doc(user.uid).set({
         email : user.email,
         upvotedOn: []
-    })
+    });
     //for background triggers you must return a value/promise
 });
 
@@ -21,6 +21,26 @@ exports.userDeleted = functions.auth.user().onDelete(user => {
     //for background triggers you must return a value/promise
 });
 
+//http callable functions
+
+exports.addRequest = functions.https.onCall((data, context) => {
+    if(!context.auth){
+        throw new functions.https.HttpsError(
+            'unauthenticated',
+            'Only Authenticated Users Are Allowed to Add Request'
+        );
+    }
+    if(data.text.length > 30){
+        throw new functions.https.HttpsError(
+            'invalid-argument',
+            'Request should be less than 30 characters'
+        );
+    }
+    return admin.firestore().collection('requests').add({
+        text: data.text,
+        upvotes: 0
+    });
+});
 
 // //http request 1
 
