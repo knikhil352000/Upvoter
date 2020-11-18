@@ -42,6 +42,42 @@ exports.addRequest = functions.https.onCall((data, context) => {
     });
 });
 
+//Upvote callable function
+exports.upvote = functions.https.onCall((data, context) => {
+    if(!context.auth){
+        throw new functions.https.HttpsError(
+            'unauthenticated',
+            'Only Authenticated Users Are Allowed to Add Request'
+        );
+    }
+    // get refs for user doc & request doc
+    const user = admin.firestore().collection('users').doc(context.auth.uid);
+    const request = admin.firestore().collection('requests').doc(data.id);
+
+    return user.get().then(doc => {
+        //check if the user has already upvoted
+        if(doc.data().upvotedOn.includes(data.id)){
+            throw new functions.https.HttpsError(
+                'failed-precondition',
+                'You can only upvote something once'
+            );
+        }
+
+        //update user array
+        return user.update({
+            upvotedOn: [...doc.data().upvotedOn, data.id]
+        }) 
+        .then(() => {
+            //updates votes on the request
+            return request.update({
+                upvotes: admin.firestore.FieldValue.increment(1)
+            })
+        })
+    })
+    
+})
+
+
 // //http request 1
 
 // exports.randomNumber = functions.https.onRequest((request, response) => {
