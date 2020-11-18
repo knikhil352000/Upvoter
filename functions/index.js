@@ -43,7 +43,7 @@ exports.addRequest = functions.https.onCall((data, context) => {
 });
 
 //Upvote callable function
-exports.upvote = functions.https.onCall((data, context) => {
+exports.upvote = functions.https.onCall(async (data, context) => {
     if(!context.auth){
         throw new functions.https.HttpsError(
             'unauthenticated',
@@ -54,7 +54,7 @@ exports.upvote = functions.https.onCall((data, context) => {
     const user = admin.firestore().collection('users').doc(context.auth.uid);
     const request = admin.firestore().collection('requests').doc(data.id);
 
-    return user.get().then(doc => {
+    const doc = await user.get();
         //check if the user has already upvoted
         if(doc.data().upvotedOn.includes(data.id)){
             throw new functions.https.HttpsError(
@@ -64,16 +64,13 @@ exports.upvote = functions.https.onCall((data, context) => {
         }
 
         //update user array
-        return user.update({
+        await user.update({
             upvotedOn: [...doc.data().upvotedOn, data.id]
         }) 
-        .then(() => {
             //updates votes on the request
-            return request.update({
-                upvotes: admin.firestore.FieldValue.increment(1)
-            })
+        return request.update({
+            upvotes: admin.firestore.FieldValue.increment(1)
         })
-    })
     
 })
 
