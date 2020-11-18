@@ -11,12 +11,21 @@ requestModal.addEventListener('click', (e) => {
     }
 });
 
+
+
+
+
+
+
+
+
+
 // say hello function call
-const button = document.querySelector('.call');
-button.addEventListener('click', () => {
-    //get function reference
-    const sayHello = firebase.functions().httpsCallable('sayHello');
-    sayHello({name : 'Nikhil'}).then(result => {
-        console.log(result.data);
-    });
-});
+// const button = document.querySelector('.call');
+// button.addEventListener('click', () => {
+//     //get function reference
+//     const sayHello = firebase.functions().httpsCallable('sayHello');
+//     sayHello({name : 'Nikhil'}).then(result => {
+//         console.log(result.data);
+//     });
+// });
