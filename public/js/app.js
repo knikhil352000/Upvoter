@@ -19,7 +19,7 @@ requestForm.addEventListener('submit', e => {
     e.preventDefault();
     const addRequest = firebase.functions().httpsCallable('addRequest');
     addRequest({
-        text: requestForm.request.value,
+        text: requestForm.request.value
     })
     .then(() => {
         requestForm.reset();
@@ -29,7 +29,6 @@ requestForm.addEventListener('submit', e => {
     .catch(error => {
         registerForm.querySelector('.error').textContent = error.message;
     })
-
 })
 
 
